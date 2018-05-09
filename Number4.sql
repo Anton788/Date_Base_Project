@@ -196,8 +196,8 @@ CREATE TABLE CLASS_X_PARTY(
     party_id INTEGER NOT NULL REFERENCES PARTY(party_id)
 );
 
-INSERT INTO CLASS_X_PARTY(class_id, party_id) VALUES
-    (1, 3),
+INSERT INTO CLASS_X_PARTY(class_id, party_id)
+    VALUES(1, 3),
     (2, 4),
     (3, 5),
     (4, 10),
