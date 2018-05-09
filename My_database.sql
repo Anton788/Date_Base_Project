@@ -54,7 +54,7 @@ INSERT INTO TOWN(town_nm, mayor_nm, education_coeff)
         ('Kursk', 'Dmitriy Akunin', 47.567),
         ('Korolev', 'Aleksandr Hodorev', 78.59);
 
-CREATE VIEW TOWN_V AS
+CREATE VIEW TOWN_V AS (
     SELECT town_nm, mayor_nm, (CASE
         WHEN
             education_coeff < 50
@@ -62,7 +62,7 @@ CREATE VIEW TOWN_V AS
                 NULL
         ELSE
             education_coeff END )
-    FROM TOWN;
+    FROM TOWN);
 
 CREATE TABLE PARTY(
     party_id SERIAL PRIMARY KEY ,
@@ -122,14 +122,14 @@ INSERT INTO PARTY(town_id, party_type_code, first_nm, second_nm, birth_dt)
         (3, 'Горожанин', 'Maria', 'Timoshkina', '02.12.1970');
 
 CREATE VIEW PARTY_V
-    AS SELECT party_type_code, first_nm, second_nm, (CASE
+    AS (SELECT party_type_code, first_nm, second_nm, (CASE
         WHEN
             party_type_code = 'Учитель'
                 THEN SUBSTRING(birth_dt, 0, 3) || '*******' || SUBSTRING(birth_dt, 8, 3)
             ELSE
               birth_dt
         END)
-    FROM PARTY;
+    FROM PARTY);
 
 CREATE VIEW PARTY_V_TOWN
     AS (SELECT party_type_code, first_nm, second_nm, (CASE
@@ -260,11 +260,16 @@ INSERT INTO SCHOOL(town_id, school_no, address_txt, grant_amt, yard_flg, sponsor
         (3, 1, 'Mendeleevskaya street, building 11', NULL , 0, 'AZINO 777'),
         (3, 17, 'Oktybrskaya street, building 4', 2000000, 1, NULL );
 
-CREATE VIEW SCHOOL_V AS
+CREATE VIEW SCHOOL_V AS (
     SELECT school_no, address_txt, grant_amt, yard_flg, CASE
-        WHEN sponsor_nm NOTNULL THEN SUBSTRING(sponsor_nm, 0, 3) || '****'
-        ELSE sponsor_nm END
-    FROM SCHOOL;
+        WHEN
+            sponsor_nm NOTNULL
+            THEN
+                SUBSTRING(sponsor_nm, 0, 3) || '****'
+        ELSE
+            sponsor_nm
+        END
+    FROM SCHOOL);
 
 CREATE VIEW SCHOOL_V_TOWN AS (
     SELECT school_no, address_txt, grant_amt, yard_flg, CASE
@@ -311,11 +316,15 @@ INSERT INTO CLASS(school_id, class_num, character_value, progress_coeff)
         (5, 10, 'A', 46.78),
         (6, 9, 'C', 56.55);
 
-CREATE VIEW CLASS_V AS
-    SELECT class_num, character_value, CASE
-        WHEN progress_coeff < 50 THEN NULL
-        ELSE progress_coeff END
-    FROM CLASS;
+CREATE VIEW CLASS_V AS (
+    SELECT class_num, character_value,
+        CASE
+            WHEN
+                progress_coeff < 50 THEN NULL
+            ELSE
+                progress_coeff
+        END
+    FROM CLASS);
 
 CREATE TABLE CLASS_X_PARTY(
     class_id INTEGER NOT NULL REFERENCES CLASS(class_id),
