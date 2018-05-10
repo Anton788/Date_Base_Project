@@ -106,3 +106,30 @@ SELECT first_nm
                         HAVING
                             COUNT(C2.party_id) >= 2)
 ;
+
+/*
+Для каждой библиотеки, посчитать сколько в нее ходит учеников. Выыести адрес и количество учеников-посетителей.
+ */
+
+SELECT  address_txt
+    , COUNT(party_id) AS NUMBER_OF_STUDENTS
+FROM (
+    SELECT library_id
+        , address_txt
+        , Party.party_id
+        , party_type_code
+    FROM
+        (SELECT LIBRARY.library_id, address_txt, party_id
+         FROM
+             LIBRARY
+            INNER JOIN
+             PARTY_X_LIBRARY
+                ON LIBRARY.library_id = PARTY_X_LIBRARY.library_id) X
+            INNER JOIN
+                PARTY
+            ON X.party_id = PARTY.party_id) Y
+    WHERE
+        party_type_code = 'Ученик'
+GROUP BY
+    address_txt
+;
