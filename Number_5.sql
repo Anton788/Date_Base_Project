@@ -11,19 +11,28 @@ FROM TOWN
             close_case_coeff > 50
 
 /*
-Вывести номер, адрес и количество классов каждой школы, получающей грант.
+Вывести номер, адрес и наиболее успешные классы(те у которых коэффициент обучаемости самый большой) каждой школы,
+получающей грант.
  */
 SELECT school_no
     , address_txt
-    , COUNT(class_num)*COUNT(character_value)
+    , (class_num
+    , character_value) AS best_class
 FROM
      SCHOOL
     INNER JOIN
      CLASS
     ON SCHOOL.school_id = CLASS.school_id AND
-        grant_amt NOTNULL
-GROUP BY school_no
-    ,   address_txt
+        grant_amt NOTNULL AND
+        progress_coeff IN (
+            SELECT MAX(progress_coeff)
+            FROM
+                CLASS
+                INNER JOIN
+                SCHOOL S2
+                    ON CLASS.school_id = S2.school_id
+            GROUP BY school_no
+        )
 ;
 
 /*
