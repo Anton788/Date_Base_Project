@@ -51,23 +51,28 @@ WHERE Z.grant_amt NOTNULL
  */
 SELECT first_nm
     , second_nm
-FROM (
-    SELECT first_nm
-        , second_nm
-        , COUNT(school_no)
+FROM(
+    PARTY
+    INNER JOIN
+    (SELECT PARTY.party_id
+         , COUNT (school_id)
     FROM (
-        SCHOOL
-        INNER JOIN
-        SCHOOL_X_PARTY
-        ON SCHOOL.school_id = SCHOOL_X_PARTY.school_id) X
+        (SELECT
+            SCHOOL.school_id
+            , party_id
+        FROM (
+            SCHOOL
+            INNER JOIN
+            SCHOOL_X_PARTY
+            ON SCHOOL.school_id = SCHOOL_X_PARTY.school_id)) X
         INNER JOIN
         PARTY
         ON X.party_id = PARTY.party_id
-    GROUP BY first_nm
-        , second_nm
-    HAVING
-        COUNT(school_no) >= 2) AS X2
-;
+    )
+    GROUP by PARTY.party_id
+    HAVING COUNT (school_id) >= 2) Y
+    ON PARTY.party_id = Y.party_id
+);
 
 
 /*
