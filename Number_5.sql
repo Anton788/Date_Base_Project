@@ -18,21 +18,32 @@ SELECT school_no
     , address_txt
     , (class_num
     , character_value) AS best_class
-FROM
-     SCHOOL
+FROM(
+    (SELECT CLASS.school_id
+         , school_no
+         , class_num
+         , address_txt
+         , progress_coeff
+         , character_value
+         , grant_amt
+     FROM
+        SCHOOL
     INNER JOIN
-     CLASS
-    ON SCHOOL.school_id = CLASS.school_id AND
-        grant_amt NOTNULL AND
-        progress_coeff IN (
-            SELECT MAX(progress_coeff)
+        CLASS
+    ON SCHOOL.school_id = CLASS.school_id) X
+    INNER JOIN
+    (SELECT CLASS.school_id
+         , MAX(progress_coeff) AS best_coeff
             FROM
                 CLASS
                 INNER JOIN
                 SCHOOL S2
                     ON CLASS.school_id = S2.school_id
-            GROUP BY school_no
-        )
+            GROUP BY CLASS.school_id
+        ) Y
+    ON X.school_id = Y.school_id AND
+    best_coeff = progress_coeff) Z
+WHERE Z.grant_amt NOTNULL
 ;
 
 /*
