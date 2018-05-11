@@ -80,23 +80,32 @@ FROM(
  */
 SELECT first_nm
     , second_nm
-FROM (
-    SELECT first_nm
-        , second_nm
-    FROM (SCHOOL
-        INNER JOIN
-        SCHOOL_X_PARTY
-        ON SCHOOL.school_id = SCHOOL_X_PARTY.school_id) X
+FROM(
+    PARTY
+    INNER JOIN
+    (SELECT PARTY.party_id
+         , COUNT (school_id)
+    FROM (
+        (SELECT
+            SCHOOL.school_id
+            , party_id
+        FROM (
+            SCHOOL
+            INNER JOIN
+            SCHOOL_X_PARTY
+            ON SCHOOL.school_id = SCHOOL_X_PARTY.school_id)) X
         INNER JOIN
         PARTY
         ON X.party_id = PARTY.party_id
-    GROUP BY first_nm
-            , second_nm
-    HAVING COUNT(school_no) >= 2) AS X2
+    )
+    GROUP by PARTY.party_id
+    HAVING COUNT (school_id) >= 2) Y
+    ON PARTY.party_id = Y.party_id
+)
 INTERSECT
 SELECT first_nm
     , second_nm
-    FROM (
+FROM (
         SELECT first_nm
             , second_nm
             , class_id
@@ -131,7 +140,6 @@ SELECT first_nm
                         HAVING
                             COUNT(C2.party_id) >= 2)
 ;
-
 /*
 Для каждой библиотеки, посчитать сколько в нее ходит учеников. Выыести адрес и количество учеников-посетителей.
  */
